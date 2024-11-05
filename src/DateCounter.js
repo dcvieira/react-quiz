@@ -1,49 +1,50 @@
-import { useState, useReducer } from "react";
+import { useReducer } from "react";
+
+const initialState = {
+  count: 0,
+  step: 1,
+};
 
 function DateCounter() {
-  // const [count, setCount] = useState(0);
-  const [step, setStep] = useReducer((state, action) => {
+  const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
-      case "set":
-        return action.payload;
-    }
-  }, 1);
-
-  const [count, dispatch] = useReducer((state, action) => {
-    switch (action.type) {
-      case "inc":
-        return state + step;
-      case "dec":
-        return state - step;
-      case "set":
-        return action.payload;
+      case "increment":
+        return { ...state, count: state.count + state.step };
+      case "decrement":
+        return { ...state, count: state.count - state.step };
+      case "setCount":
+        return { ...state, count: action.payload };
+      case "setStep":
+        return { ...state, step: action.payload };
+      case "reset":
+        return initialState;
       default:
-        return state;
+        throw new Error("Invalid action type");
     }
-  }, 0);
+  }, initialState);
 
   // This mutates the date object.
   const date = new Date("june 21 2027");
   //date.setDate(date.getDate() + count);
 
   const dec = function () {
-    dispatch({ type: "dec" });
+    dispatch({ type: "decrement" });
   };
 
   const inc = function () {
-    dispatch({ type: "inc" });
+    dispatch({ type: "increment" });
   };
 
   const defineCount = function (e) {
-    dispatch({ type: "set", payload: Number(e.target.value) });
+    dispatch({ type: "setCount", payload: Number(e.target.value) });
   };
 
   const defineStep = function (e) {
-    setStep({ type: "set", payload: Number(e.target.value) });
+    dispatch({ type: "setStep", payload: Number(e.target.value) });
   };
 
   const reset = function () {
-    dispatch({ type: "set", payload: 1 });
+    dispatch({ type: "reset" });
   };
 
   return (
@@ -53,15 +54,15 @@ function DateCounter() {
           type="range"
           min="0"
           max="10"
-          value={step}
+          value={state.step}
           onChange={defineStep}
         />
-        <span>{step}</span>
+        <span>{state.step}</span>
       </div>
 
       <div>
         <button onClick={dec}>-</button>
-        <input value={count} onChange={defineCount} />
+        <input value={state.count} onChange={defineCount} />
         <button onClick={inc}>+</button>
       </div>
 
